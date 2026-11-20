@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>fack mdm & hilal</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+    background: #09080d;
+    color: white;
+    font-family: 'Press Start 2P', monospace;
+}
+
+video {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 4, 10, .76);
+    z-index: -1;
+}
+
+.hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+h1 {
+    font-size: clamp(20px, 5vw, 42px);
+    letter-spacing: 2px;
+}
+
+.subtitle {
+    font-size: 9px;
+    color: #b7a5c9;
+    margin-top: 25px;
+    line-height: 2;
+}
+
+.account {
+    margin-top: 35px;
+    padding: 20px;
+    border: 1px solid #59416d;
+    background: rgba(30, 20, 40, .55);
+    font-size: 10px;
+}
+
+.section {
+    min-height: 100vh;
+    padding: 100px 20px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background: rgba(8, 7, 12, .88);
+}
+
+.section h2 {
+    font-size: 15px;
+    color: #c2b3d0;
+    text-align: center;
+    margin-bottom: 55px;
+}
+
+.cards {
+    width: 100%;
+    max-width: 550px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 22px;
+    background: rgba(25, 21, 31, .9);
+    border: 1px solid #413448;
+    text-decoration: none;
+    color: white;
+    transition: .25s;
+    cursor: pointer;
+}
+
+.card:hover {
+    border-color: #9879ad;
+    background: rgba(50, 39, 59, .95);
+    transform: translateY(-3px);
+}
+
+.card img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+}
+
+.card span { font-size: 10px; }
+
+.helper {
+    margin-top: 55px;
+    padding: 20px 25px;
+    border: 1px solid #59416d;
+    color: white;
+    text-decoration: none;
+    background: rgba(30, 20, 40, .8);
+    font-size: 10px;
+    transition: .25s;
+}
+
+.helper:hover {
+    background: #30253a;
+    border-color: #a58ab9;
+}
+
+footer {
+    padding: 30px;
+    text-align: center;
+    font-size: 8px;
+    color: #777;
+    background: #09080d;
+}
+
+#muteBtn {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 22px;
+    background: #211a29;
+    border: 1px solid #665274;
+    color: white;
+    font-family: inherit;
+    font-size: 9px;
+    cursor: pointer;
+    display: none;
+    z-index: 10;
+}
+
+#muteBtn:hover { background: #382b45; }
+
+#toast {
+    position: fixed;
+    bottom: 85px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #211a29;
+    border: 1px solid #665274;
+    padding: 13px 18px;
+    font-size: 9px;
+    display: none;
+    z-index: 20;
+}
+
+@media(max-width: 500px) {
+    .card { padding: 17px; }
+    .card span { font-size: 8px; }
+}
+</style>
+</head>
+
+<body>
+
+<video id="bg" autoplay loop playsinline preload="auto">
+    <source src="bg.mp4" type="video/mp4">
+</video>
+
+<div class="overlay"></div>
+
+<section class="hero">
+    <h1>META ACCOUNT</h1>
+    <p class="subtitle">Wsg</p>
+    <div class="account">playfab.lover</div>
+</section>
+
+<section class="section">
+    <h2>MY ACCOUNTS</h2>
+
+    <div class="cards">
+        <a class="card"
+           href="https://www.tiktok.com/@nyuufr"
+           target="_blank"
+           rel="noopener noreferrer">
+            <img src="tiktok.png" alt="TikTok">
+            <span>TIKTOK</span>
+        </a>
+
+        <button class="card" id="discord"
+                style="font-family:inherit;width:100%;text-align:left">
+            <img src="discord.png" alt="Discord">
+            <span>DISCORD</span>
+        </button>
+    </div>
+
+    <a class="helper"
+       href="https://moddershelp.vercel.app/"
+       target="_blank"
+       rel="noopener noreferrer">
+       MODDER HELPER ↗
+    </a>
+</section>
+
+<footer> Nyuu Lover</footer>
+
+<button id="muteBtn">MUTE AUDIO</button>
+<div id="toast">COPIED: nyuu.net</div>
+
+<script>
+const video = document.getElementById("bg");
+const muteBtn = document.getElementById("muteBtn");
+const toast = document.getElementById("toast");
+
+// تشغيل الصوت مباشرة عند الدخول
+video.muted = false;
+video.defaultMuted = false;
+video.volume = 1;
+
+let audioUnlocked = false;
+
+async function startVideo() {
+    try {
+        await video.play();
+        // إذا نجح التشغيل بالصوت
+        if (!video.muted) {
+            audioUnlocked = true;
+            muteBtn.style.display = "none";
+        }
+    } catch (error) {
+        // المتصفح منع الصوت - نحاول التشغيل صامت ثم نفتح الصوت عند أول تفاعل
+        video.muted = true;
+        try { await video.play(); } catch(e) {}
+
+        // إظهار زر الصوت
+        muteBtn.textContent = "CLICK TO ENABLE AUDIO";
+        muteBtn.style.display = "block";
+
+        // مستمعات لأول تفاعل من المستخدم
+        const unlock = async () => {
+            if (audioUnlocked) return;
+            video.muted = false;
+            video.volume = 1;
+            try {
+                await video.play();
+                audioUnlocked = true;
+                muteBtn.textContent = "MUTE AUDIO";
+                muteBtn.style.display = "block";
+            } catch(e) {}
+
+            // إزالة المستمعات بعد المحاولة
+            ["click", "touchstart", "keydown", "scroll", "mousemove"].forEach(ev => {
+                window.removeEventListener(ev, unlock);
+            });
+        };
+
+        ["click", "touchstart", "keydown", "scroll", "mousemove"].forEach(ev => {
+            window.addEventListener(ev, unlock, { once: false, passive: true });
+        });
+    }
+}
+
+startVideo();
+
+muteBtn.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    if (video.muted || video.paused) {
+        video.muted = false;
+        video.volume = 1;
+        try { await video.play(); } catch(err) {}
+        audioUnlocked = true;
+        muteBtn.textContent = "MUTE AUDIO";
+    } else {
+        video.muted = true;
+        muteBtn.textContent = "UNMUTE AUDIO";
+    }
+});
+
+// إظهار زر الصوت عند التمرير لأسفل
+window.addEventListener("scroll", () => {
+    if (window.scrollY > 150) {
+        muteBtn.style.display = "block";
+    } else if (audioUnlocked) {
+        muteBtn.style.display = "none";
+    }
+});
+
+// نسخ يوزر الديسكورد
+document.getElementById("discord").addEventListener("click", async () => {
+    try {
+        await navigator.clipboard.writeText("nyuu.net");
+        toast.textContent = "COPIED: nyuu.net";
+    } catch {
+        toast.textContent = "COPY FAILED";
+    }
+
+    toast.style.display = "block";
+    setTimeout(() => toast.style.display = "none", 2000);
+});
+</script>
+
+</body>
+</html>
